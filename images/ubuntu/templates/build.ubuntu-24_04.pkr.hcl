@@ -188,6 +188,11 @@ provisioner "shell" {
   }
 
   provisioner "shell" {
+    execute_command   = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
+    scripts           = ["${path.root}/../scripts/build/configure-cloud-init.sh"]
+  }
+
+  provisioner "shell" {
     execute_command     = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
     pause_before        = "5m0s"
     scripts             = ["${path.root}/../scripts/build/cleanup.sh"]
