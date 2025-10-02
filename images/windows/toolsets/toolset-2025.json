@@ -43,7 +43,8 @@
             "versions": [
                 "18.*",
                 "20.*",
-                "22.*"
+                "22.*",
+                "24.*"
             ]
         },
         {
@@ -278,6 +279,7 @@
             { "name": "aria2" },
             { "name": "azcopy10" },
             { "name": "Bicep" },
+            { "name": "innosetup" },
             { "name": "jq" },
             { "name": "NuGet.CommandLine" },
             { "name": "packer" },
@@ -295,7 +297,7 @@
             },
             {
                 "name": "strawberryperl" ,
-                "args": [ "--version", "5.40.2.2" ]
+                "args": [ "--version", "5.42.0.1" ]
             },
             { "name": "imagemagick" },
             { "name": "ninja" }
