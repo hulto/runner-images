@@ -1,3 +1,4 @@
+# Setup dev environment
 ```bash
 # Install Powershell
 sudo apt-get update
@@ -8,8 +9,6 @@ sudo dpkg -i packages-microsoft-prod.deb
 rm packages-microsoft-prod.deb
 sudo apt-get update
 sudo apt-get install -y powershell
-
-pwsh
 
 # Install az cli
 sudo apt-get update
@@ -47,18 +46,19 @@ pwsh
 Create resource group - `runner-build`
 Create network - `runner-build`
 
+# Build images in azure
 ```powershell
 az sig create --resource-group runner-build --gallery-name myGallery
 
-az sig image-definition create \
-   --resource-group runner-build \
-   --hyper-v-generation V1 \
-   --gallery-name myGallery \
-   --gallery-image-definition ubuntu24runnerbuild \
-   --publisher me \
-   --offer test \
-   --sku build \
-   --os-type Linux \
+az sig image-definition create `
+   --resource-group runner-build `
+   --hyper-v-generation V1 `
+   --gallery-name myGallery `
+   --gallery-image-definition ubuntu24runnerbuild `
+   --publisher me `
+   --offer test `
+   --sku build `
+   --os-type Linux `
    --os-state Generalized
 
 PS /workspace/runner-images> $Env:GALLERY_NAME="myGallery"
@@ -75,6 +75,31 @@ PS /workspace/runner-images> GenerateResourcesAndImage `
         -RestrictToAgentIpAddress ubuntu24runnerbuild3
 
 
+az sig image-definition create `
+   --resource-group runner-build `
+   --hyper-v-generation V1 `
+   --gallery-name myGallery `
+   --gallery-image-definition win25runnerbuild `
+   --publisher me `
+   --offer test `
+   --sku winbuild `
+   --os-type Windows `
+   --os-state Generalized
+
+PS /workspace/runner-images> $Env:GALLERY_NAME="myGallery"
+PS /workspace/runner-images> $Env:GALLERY_RG_NAME="runner-build"
+PS /workspace/runner-images> $Env:GALLERY_IMAGE_VERSION="1.0.1"
+PS /workspace/runner-images> $Env:GALLERY_IMAGE_NAME="win25runnerbuild"
+PS /workspace/runner-images> Import-Module ./helpers/GenerateResourcesAndImage.ps1
+PS /workspace/runner-images> GenerateResourcesAndImage `
+        -SubscriptionId "2ff36a90-fb00-4e91-bb2c-831390abfb40" `
+        -ResourceGroupName "runner-build" `
+        -ImageType "Windows2025" `
+        -AzureLocation "East US" `
+        -ImageGenerationRepositoryRoot "/workspace/runner-images" `
+        -RestrictToAgentIpAddress win25runnerbuild
+
+
 az sig image-version list `
    --resource-group "runner-build" `
    --gallery-name 'myGallery' `
@@ -83,4 +108,23 @@ az sig image-version list `
 
 az disk create --resource-group "runner-build" --location "East US" --name exportDisk1.0.2 --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/runner-build/providers/Microsoft.Compute/galleries/myGallery/images/ubuntu24runnerbuild/versions/1.0.2" 
 
+az disk create --resource-group "runner-build" --location "East US" --name exportDiskwin1.0.0 --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/runner-build/providers/Microsoft.Compute/galleries/myGallery/images/win25runnerbuild/versions/1.0.0" 
+
+
+# TODO:
+# - Switch windows to DHCP - seems to work when network is set to e1000
+# - OS boots when Disk set to SATA not virtio
+# - Resolve Administrator and locale setup - Probably can ignore
+# - Fix post setup ^ grey screen - Probably can ignore
+
+# - Install cloudbase-init
+# - Install qemu-guestagent
+# "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\Python\Scripts\cloudbase-init" --config-file "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\conf\cloudbase-init.conf" --debug --noreset_service_password
 ```
+
+# Export
+
+Navigate to the newly created disk.
+Click export disk.
+You may need to increase the link timeout.
+Click generate link.
