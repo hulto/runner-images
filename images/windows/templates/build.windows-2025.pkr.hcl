@@ -249,6 +249,9 @@ provisioner "powershell" {
     environment_vars = ["INSTALL_USER=${var.install_user}"]
     scripts          = [
       "${path.root}/../scripts/build/Install-NativeImages.ps1",
+      "${path.root}/../scripts/build/Configure-VirtIO.ps1",
+      "${path.root}/../scripts/build/Configure-QemuGuestAgent.ps1",
+      "${path.root}/../scripts/build/Configure-CloudbaseInit.ps1",
       "${path.root}/../scripts/build/Configure-System.ps1",
       "${path.root}/../scripts/build/Configure-User.ps1",
       "${path.root}/../scripts/build/Post-Build-Validation.ps1"
