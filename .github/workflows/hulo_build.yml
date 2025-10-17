@@ -1,8 +1,9 @@
 name: Hulo Build
 
-# on: 
-#   schedule: 
-#     - cron: '22 2 * * 6' # At 02:22, only on Saturday
+on:
+  workflow_dispatch: ~
+  push:
+    branches: [ main ]
 
 jobs:
   linux-build:
