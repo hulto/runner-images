@@ -19,12 +19,12 @@ jobs:
         shell: pwsh
         run: >-
           Import-Module ./helpers/GenerateResourcesAndImage.ps1 &&
-          GenerateResourcesAndImage
-            -SubscriptionId 2ff36a90-fb00-4e91-bb2c-831390abfb40
-            -ResourceGroupName $Env:GALLERY_RG_NAME
-            -ImageType "Ubuntu2404"
-            -AzureLocation "East US"
-            -ImageGenerationRepositoryRoot "./runner-images"
+          GenerateResourcesAndImage `
+            -SubscriptionId 2ff36a90-fb00-4e91-bb2c-831390abfb40 `
+            -ResourceGroupName $Env:GALLERY_RG_NAME `
+            -ImageType "Ubuntu2404" `
+            -AzureLocation "East US" `
+            -ImageGenerationRepositoryRoot "./runner-images" `
             -RestrictToAgentIpAddress ubuntu24runnerbuild4 &&
           az disk create --resource-group $Env:GALLERY_RG_NAME --location "East US" --name exportDisk --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/$Env:GALLERY_RG_NAME/providers/Microsoft.Compute/galleries/$Env:GALLERY_NAME/images/$Env:GALLERY_IMAGE_NAME/versions/$Env:GALLERY_IMAGE_VERSION" 
 
