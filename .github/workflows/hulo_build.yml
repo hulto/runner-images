@@ -28,26 +28,24 @@ jobs:
             -RestrictToAgentIpAddress ubuntu24runnerbuild4 &&
           az disk create --resource-group $Env:GALLERY_RG_NAME --location "East US" --name exportDisk --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/$Env:GALLERY_RG_NAME/providers/Microsoft.Compute/galleries/$Env:GALLERY_NAME/images/$Env:GALLERY_IMAGE_NAME/versions/$Env:GALLERY_IMAGE_VERSION" 
 
-  # windows-build:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     GALLERY_NAME: myGallery
-  #     GALLERY_RG_NAME: runner-build
-  #     GALLERY_IMAGE_VERSION: 1.0.0
-  #     GALLERY_IMAGE_NAME: win25runnerbuild
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: build ubuntu
-  #       shell: pwsh
-  #       run: >
-  #         Import-Module ./helpers/GenerateResourcesAndImage.ps1 &&
-  #         GenerateResourcesAndImage
-  #           -SubscriptionId 2ff36a90-fb00-4e91-bb2c-831390abfb40
-  #           -ResourceGroupName $Env:GALLERY_RG_NAME
-  #           -ImageType "Windows2025"
-  #           -AzureLocation "East US"
-  #           -ImageGenerationRepositoryRoot "./runner-images"
-  #           -RestrictToAgentIpAddress win25runnerbuild &&
-  #         az disk create --resource-group $Env:GALLERY_RG_NAME --location "East US" 
-  #           --name "$EnV:GALLERY_IMAGE_NAME_$Env:GALLERY_IMAGE_VERSION" 
-  #           --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/$Env:GALLERY_RG_NAME/providers/Microsoft.Compute/galleries/$Env:GALLERY_NAME/images/$Env:GALLERY_IMAGE_NAME/versions/$Env:GALLERY_IMAGE_VERSION" 
+  windows-build:
+    runs-on: ubuntu-latest
+    env:
+      GALLERY_NAME: myGallery
+      GALLERY_RG_NAME: runner-build
+      GALLERY_IMAGE_VERSION: 1.0.0
+      GALLERY_IMAGE_NAME: win25runnerbuild
+    steps:
+      - uses: actions/checkout@v3
+      - name: build ubuntu
+        shell: pwsh
+        run: >-
+          Import-Module ./helpers/GenerateResourcesAndImage.ps1 &&
+          GenerateResourcesAndImage `
+            -SubscriptionId 2ff36a90-fb00-4e91-bb2c-831390abfb40 `
+            -ResourceGroupName $Env:GALLERY_RG_NAME `
+            -ImageType "Windows2025" `
+            -AzureLocation "East US" `
+            -ImageGenerationRepositoryRoot "./" `
+            -RestrictToAgentIpAddress win25runnerbuild &&
+          az disk create --resource-group $Env:GALLERY_RG_NAME --location "East US" --name exportDiskWin --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/$Env:GALLERY_RG_NAME/providers/Microsoft.Compute/galleries/$Env:GALLERY_NAME/images/$Env:GALLERY_IMAGE_NAME/versions/$Env:GALLERY_IMAGE_VERSION" 
