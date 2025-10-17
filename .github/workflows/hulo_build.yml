@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: build ubuntu
-        shell: powershell
+        shell: pwsh
         run: >
           Import-Module ./helpers/GenerateResourcesAndImage.ps1 &&
           GenerateResourcesAndImage
@@ -40,7 +40,7 @@ jobs:
   #   steps:
   #     - uses: actions/checkout@v3
   #     - name: build ubuntu
-  #       shell: powershell
+  #       shell: pwsh
   #       run: >
   #         Import-Module ./helpers/GenerateResourcesAndImage.ps1 &&
   #         GenerateResourcesAndImage
