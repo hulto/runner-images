@@ -63,7 +63,7 @@ az sig image-definition create `
 
 PS /workspace/runner-images> $Env:GALLERY_NAME="myGallery"
 PS /workspace/runner-images> $Env:GALLERY_RG_NAME="runner-build"
-PS /workspace/runner-images> $Env:GALLERY_IMAGE_VERSION="1.0.1"
+PS /workspace/runner-images> $Env:GALLERY_IMAGE_VERSION="1.0.3"
 PS /workspace/runner-images> $Env:GALLERY_IMAGE_NAME="ubuntu24runnerbuild"
 PS /workspace/runner-images> Import-Module ./helpers/GenerateResourcesAndImage.ps1
 PS /workspace/runner-images> GenerateResourcesAndImage `
@@ -72,7 +72,7 @@ PS /workspace/runner-images> GenerateResourcesAndImage `
         -ImageType "Ubuntu2404" `
         -AzureLocation "East US" `
         -ImageGenerationRepositoryRoot "/workspace/runner-images" `
-        -RestrictToAgentIpAddress ubuntu24runnerbuild3
+        -RestrictToAgentIpAddress ubuntu24runnerbuild4
 
 
 az sig image-definition create `
@@ -99,6 +99,29 @@ PS /workspace/runner-images> GenerateResourcesAndImage `
         -ImageGenerationRepositoryRoot "/workspace/runner-images" `
         -RestrictToAgentIpAddress win25runnerbuild
 
+az sig image-definition create `
+   --resource-group runner-build `
+   --hyper-v-generation V1 `
+   --gallery-name myGallery `
+   --gallery-image-definition win25runnerbuild `
+   --publisher me `
+   --offer test `
+   --sku winbuild `
+   --os-type Windows `
+   --os-state Generalized
+
+PS /workspace/runner-images> $Env:GALLERY_NAME="myGallery"
+PS /workspace/runner-images> $Env:GALLERY_RG_NAME="runner-build"
+PS /workspace/runner-images> $Env:GALLERY_IMAGE_VERSION="1.0.0"
+PS /workspace/runner-images> $Env:GALLERY_IMAGE_NAME="macosrunnerbuild"
+PS /workspace/runner-images> Import-Module ./helpers/GenerateResourcesAndImage.ps1
+PS /workspace/runner-images> GenerateResourcesAndImage `
+        -SubscriptionId "2ff36a90-fb00-4e91-bb2c-831390abfb40" `
+        -ResourceGroupName "runner-build" `
+        -ImageType "Windows2025" `
+        -AzureLocation "East US" `
+        -ImageGenerationRepositoryRoot "/workspace/runner-images" `
+        -RestrictToAgentIpAddress macosrunnerbuild
 
 az sig image-version list `
    --resource-group "runner-build" `
@@ -106,20 +129,9 @@ az sig image-version list `
    --gallery-image-definition "ubuntu24runnerbuild" `
    -o table
 
-az disk create --resource-group "runner-build" --location "East US" --name exportDisk1.0.2 --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/runner-build/providers/Microsoft.Compute/galleries/myGallery/images/ubuntu24runnerbuild/versions/1.0.2" 
+az disk create --resource-group "runner-build" --location "East US" --name exportDisk1.0.3 --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/runner-build/providers/Microsoft.Compute/galleries/myGallery/images/ubuntu24runnerbuild/versions/1.0.3" 
 
-az disk create --resource-group "runner-build" --location "East US" --name exportDiskwin1.0.0 --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/runner-build/providers/Microsoft.Compute/galleries/myGallery/images/win25runnerbuild/versions/1.0.0" 
-
-
-# TODO:
-# - Switch windows to DHCP - seems to work when network is set to e1000
-# - OS boots when Disk set to SATA not virtio
-# - Resolve Administrator and locale setup - Probably can ignore
-# - Fix post setup ^ grey screen - Probably can ignore
-
-# - Install cloudbase-init
-# - Install qemu-guestagent
-# "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\Python\Scripts\cloudbase-init" --config-file "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\conf\cloudbase-init.conf" --debug --noreset_service_password
+az disk create --resource-group "runner-build" --location "East US" --name exportDiskwin1.0.1 --gallery-image-reference "/subscriptions/2ff36a90-fb00-4e91-bb2c-831390abfb40/resourceGroups/runner-build/providers/Microsoft.Compute/galleries/myGallery/images/win25runnerbuild/versions/1.0.1" 
 ```
 
 # Export
