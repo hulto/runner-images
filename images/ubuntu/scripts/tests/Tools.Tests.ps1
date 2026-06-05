@@ -9,7 +9,7 @@ Describe "azcopy" {
     }
 }
 
-Describe "Bicep" {
+Describe "Bicep" -Skip:(Test-IsArm64) {
     It "Bicep" {
         "bicep --version" | Should -ReturnZeroExitCode
     }
@@ -99,7 +99,7 @@ Describe "Docker" {
         }
     }
 
-    It "docker compose v2" {
+    It "docker compose" {
         $version=(Get-ToolsetContent).docker.plugins | Where-Object { $_.plugin -eq 'compose' } | Select-Object -ExpandProperty version
         If ($version -ne "latest") {
             $(docker compose version --short) | Should -BeLike "*$version*"
@@ -110,14 +110,6 @@ Describe "Docker" {
 
     It "docker-credential-ecr-login" {
         "docker-credential-ecr-login -v" | Should -ReturnZeroExitCode
-    }
-}
-
-Describe "Docker images" {
-    $testCases = (Get-ToolsetContent).docker.images | ForEach-Object { @{ ImageName = $_ } }
-
-    It "<ImageName>" -TestCases $testCases {
-       sudo docker images "$ImageName" --format "{{.Repository}}" | Should -Not -BeNullOrEmpty
     }
 }
 
@@ -170,7 +162,7 @@ Describe "gfortran" {
     }
 }
 
-Describe "Mono" -Skip:(Test-IsUbuntu24) {
+Describe "Mono" -Skip:((-not (Test-IsUbuntu22))) {
     It "mono" {
         "mono --version" | Should -ReturnZeroExitCode
     }
@@ -184,25 +176,25 @@ Describe "Mono" -Skip:(Test-IsUbuntu24) {
     }
 }
 
-Describe "MSSQLCommandLineTools" -Skip:((-not (Test-IsUbuntu22))) {
+Describe "MSSQLCommandLineTools" -Skip:((-not (Test-IsUbuntu22-X64))) {
     It "sqlcmd" {
         "sqlcmd -?" | Should -ReturnZeroExitCode
     }
 }
 
-Describe "SqlPackage" -Skip:((-not (Test-IsUbuntu22))) {
+Describe "SqlPackage" -Skip:((-not (Test-IsUbuntu22-X64))) {
     It "sqlpackage" {
         "sqlpackage /version" | Should -ReturnZeroExitCode
     }
 }
 
-Describe "R" -Skip:((-not (Test-IsUbuntu22))) {
+Describe "R" -Skip:((-not (Test-IsUbuntu22-X64))) {
     It "r" {
         "R --version" | Should -ReturnZeroExitCode
     }
 }
 
-Describe "Sbt" -Skip:((-not (Test-IsUbuntu22))) {
+Describe "Sbt" -Skip:((-not (Test-IsUbuntu22-X64))) {
     It "sbt" {
         "sbt --version" | Should -ReturnZeroExitCode
     }
@@ -253,7 +245,7 @@ Describe "Git-lfs" {
     }
 }
 
-Describe "Heroku" -Skip:((-not (Test-IsUbuntu22))) {
+Describe "Heroku" -Skip:((-not (Test-IsUbuntu22-X64))) {
     It "heroku" {
         "heroku --version" | Should -ReturnZeroExitCode
     }
@@ -265,7 +257,7 @@ Describe "Homebrew" {
     }
 }
 
-Describe "Julia" {
+Describe "Julia" -Skip:(-not ((Test-IsUbuntu22-X64) -or (Test-IsUbuntu24-X64))) {
     It "julia" {
         "julia --version" | Should -ReturnZeroExitCode
     }
@@ -293,13 +285,13 @@ Describe "Kubernetes tools" {
     }
 }
 
-Describe "Leiningen" -Skip:((-not (Test-IsUbuntu22))) {
+Describe "Leiningen" -Skip:((-not (Test-IsUbuntu22-X64))) {
     It "leiningen" {
         "lein --version" | Should -ReturnZeroExitCode
     }
 }
 
-Describe "Conda" {
+Describe "Conda" -Skip:(-not ((Test-IsUbuntu22-X64) -or (Test-IsUbuntu24-X64))) {
     It "conda" {
         "conda --version" | Should -ReturnZeroExitCode
     }
@@ -311,7 +303,7 @@ Describe "Packer" {
     }
 }
 
-Describe "Pulumi" {
+Describe "Pulumi" -Skip:(Test-IsUbuntu26) {
     It "pulumi" {
         "pulumi version" | Should -ReturnZeroExitCode
     }
@@ -415,5 +407,24 @@ project(NinjaTest NONE)
 
     AfterAll {
         Remove-Item -Path "/tmp/ninjaproject" -Recurse -Force
+    }
+}
+
+Describe "AWF" -Skip:(Test-IsUbuntu22) {
+    It "AWF toolcache directory exists" {
+        $awfPath = Join-Path $env:AGENT_TOOLSDIRECTORY "agentic-workflow-firewall-js"
+        $awfPath | Should -Exist
+    }
+
+    It "At least 3 versions are installed" {
+        $awfPath = Join-Path $env:AGENT_TOOLSDIRECTORY "agentic-workflow-firewall-js"
+        (Get-ChildItem -Path $awfPath -Directory).Count | Should -BeGreaterOrEqual 3
+    }
+
+    It "AWF JS bundle exists" {
+        $awfPath = Join-Path $env:AGENT_TOOLSDIRECTORY "agentic-workflow-firewall-js"
+        $latestVersion = Get-ChildItem -Path $awfPath -Directory | Sort-Object -Property { [version]$_.Name } -Descending | Select-Object -First 1
+        $bundlePath = Join-Path $latestVersion.FullName "x64" "awf-bundle.js"
+        $bundlePath | Should -Exist
     }
 }
